@@ -1,5 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
+# Joey Spielman| Module 8.2 | MySQL connection test.
+
 
 """ database config object """
 config = {
