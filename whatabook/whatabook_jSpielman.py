@@ -20,7 +20,6 @@ def validate_user():
                 return user_id
         except ValueError:
             print("\nInvalid entry.")
-
 #query to fetch all users
 def select_all_users(cursor):
     cursor.execute("SELECT * FROM user")
@@ -56,7 +55,51 @@ def select_user_wishlist(cursor,user_id):
      
     for book in wishlist:
         print("Book Name: {}    Author: {}\n".format(book[4],book[5]))
+#main menu method
+def show_menu():
+    end = False
+
+    while(end == False):
+        try:
+            menu_selection = int(input("Enter 1 to view all books, 2 to view all locations,3 to view your account, or 4 to quit: "))
+            if menu_selection == 1:
+                select_all_books(cursor)
+            if menu_selection == 2:
+                select_all_stores(cursor)
+            if menu_selection == 3:
+                show_account_menu()
+                #print("Feature unavailable")
+            if menu_selection == 4:
+                input("Program ended. Press any key to continue....")
+                end = True
+            if menu_selection > 4 or menu_selection < 1:
+                print("Selection out of Range!")
+        except ValueError:
+            print("\nInvalid Entry.")
+
+#account menu view
+def show_account_menu():
+    validate_user()
     
+    end = False
+
+    while(end == False):
+        try:
+            account_menu_selection = int(input("\nEnter 1 to view your wishlist, 2 to add a book to your wishlist, or 3 to return to the main menu: "))
+            if account_menu_selection == 1:
+                select_user_wishlist(cursor,user_id)
+            if account_menu_selection == 2:
+                print("Add feature unavailable.")
+            if account_menu_selection == 3:
+                print("\nReturned to M
+                ain Menu")
+                end = True
+            if account_menu_selection > 3 or account_menu_selection < 1:
+                print("Selection out of range!")
+        except ValueError:
+            print("Invalid Entry!")
+    
+
 config = {
     "user": "whatabook_user",
     "password": "MySQL8IsGreat!",
@@ -74,7 +117,8 @@ try:
     cursor = db.cursor()
     
     # output the connection status 
-    print("\n  Database user {} connected to MySQL on host {} with database {}".format(config["user"], config["host"], config["database"]))
+    print("\nDatabase user {} connected to MySQL on host {} with database {}".format(config["user"], config["host"], config["database"]))
+    print("\nWelcome to Whatabook.")
 
    # input("\n\n  Press any key to continue...")
 
@@ -83,7 +127,9 @@ try:
     #select_all_books(cursor)
     #select_all_stores(cursor)
     #select_user_wishlist(cursor,"2")
-    validate_user()
+    #validate_user()
+    #select_user_wishlist(cursor,user_id)
+    show_menu()
 
 except mysql.connector.Error as err:
     """ on error code """
