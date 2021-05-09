@@ -91,8 +91,7 @@ def show_account_menu():
             if account_menu_selection == 2:
                 print("Add feature unavailable.")
             if account_menu_selection == 3:
-                print("\nReturned to M
-                ain Menu")
+                print("\nReturned to Main Menu")
                 end = True
             if account_menu_selection > 3 or account_menu_selection < 1:
                 print("Selection out of range!")
