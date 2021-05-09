@@ -1,6 +1,8 @@
 /*
     Joey Spielman| Whatabook init file| 05/02/21
 */
+
+/* Prep for running sql with exisitng database */
 DROP USER IF EXISTS 'whatabook_user'@'localhost';
 
 CREATE USER 'whatabook_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'MySQL8IsGreat!';
@@ -14,6 +16,8 @@ DROP TABLE IF EXISTS store;
 DROP TABLE IF EXISTS book;
 DROP TABLE IF EXISTS wishlist;
 DROP TABLE IF EXISTS user;
+
+/* Table Creation */
 CREATE TABLE user (
     user_id         INT         NOT NULL    AUTO_INCREMENT,
     first_name      VARCHAR(75) NOT NULL,
@@ -48,9 +52,11 @@ CREATE TABLE store (
     PRIMARY KEY(store_id)
 );
 
+/* Insert Table Records */
 INSERT INTO store(locale)
     VALUES('617 South Denver, Hastings, NE 68901');
 
+/* Insert Book Records */
 INSERT INTO book(book_name, author, details)
     VALUES('Ayoade on Ayoade', 'Richard Ayoade', 'A cinematic odyssey');
 
@@ -78,6 +84,7 @@ INSERT INTO book(book_name, author, details)
 INSERT INTO book(book_name, author, details)
     VALUES('American Gods', 'Neil Gaiman', 'Fantasy');
 
+/* Insert User Records */
 INSERT INTO user(first_name, last_name) 
     VALUES('Gus', 'Gusserson');
 INSERT INTO user(first_name, last_name) 
@@ -85,6 +92,7 @@ INSERT INTO user(first_name, last_name)
 INSERT INTO user(first_name, last_name) 
     VALUES('Sophie', 'Reams');
 
+/* Insert Wishlist Records */
 INSERT INTO wishlist(user_id, book_id) 
     VALUES (
         (SELECT user_id FROM user WHERE first_name = 'Gus'), 
