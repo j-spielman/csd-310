@@ -1,13 +1,12 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-#test ID
-user_id = 1
+user_id = 0
 
+#start of methods
 #validate that user input is 1,2, or 3. Loop until a valid ID is selected.
 def validate_user():
-    valid = False
-    
+    valid = False    
     while(valid == False):
         try:
             user_id = int(input("Please enter your customer ID(Users_ID 1-3 are valid): "))
@@ -20,6 +19,7 @@ def validate_user():
                 return user_id
         except ValueError:
             print("\nInvalid entry.")
+
 #query to fetch all users
 def select_all_users(cursor):
     cursor.execute("SELECT * FROM user")
@@ -52,9 +52,9 @@ def select_user_wishlist(cursor,user_id):
                     "JOIN book b ON w.book_id = b.book_id " +
                     "WHERE u.user_id = {}".format(user_id))
     wishlist = cursor.fetchall()
-     
+    print("---Your Wishlist---")
     for book in wishlist:
-        print("Book Name: {}    Author: {}\n".format(book[4],book[5]))
+        print("Book Name: {}\nAuthor: {}\n".format(book[4],book[5]))
 #main menu method
 def show_menu():
     end = False
@@ -68,7 +68,6 @@ def show_menu():
                 select_all_stores(cursor)
             if menu_selection == 3:
                 show_account_menu()
-                #print("Feature unavailable")
             if menu_selection == 4:
                 input("Program ended. Press any key to continue....")
                 end = True
@@ -77,9 +76,24 @@ def show_menu():
         except ValueError:
             print("\nInvalid Entry.")
 
+#show books not in a users wishlist
+def show_books_to_add(cursor,user_id):
+    cursor.execute("SELECT book_id, book_name, author, details " +
+                    "FROM book "+
+                    "WHERE book_id NOT IN (SELECT book_id FROM wishlist WHERE user_id ={})".format(user_id))
+    available_books = cursor.fetchall()
+    print("\nChoose a book to add ot your wishlist:")
+    for book in available_books:
+        print("\nBook ID: {}\nBook Name: {}\nAuthor: {}\nDetails: {}".format(book[0],book[1],book[2],book[3]))
+
+def add_book_to_wishlist(cursor,user_id,book_id,db):
+    cursor.execute("INSERT INTO wishlist(user_id, book_id) "+
+                    "VALUES({},{})".format(user_id,book_id))
+    print("Book has been added to your wishlist.")
+    db.commit()
 #account menu view
 def show_account_menu():
-    validate_user()
+    user_id = validate_user()
     
     end = False
 
@@ -89,7 +103,9 @@ def show_account_menu():
             if account_menu_selection == 1:
                 select_user_wishlist(cursor,user_id)
             if account_menu_selection == 2:
-                print("Add feature unavailable.")
+                show_books_to_add(cursor,user_id)
+                book_id = int(input("Enter the book_id of the book you would like to add: "))
+                add_book_to_wishlist(cursor,user_id,book_id,db)
             if account_menu_selection == 3:
                 print("\nReturned to Main Menu")
                 end = True
@@ -97,8 +113,10 @@ def show_account_menu():
                 print("Selection out of range!")
         except ValueError:
             print("Invalid Entry!")
-    
+#end of methods 
 
+
+#start of program
 config = {
     "user": "whatabook_user",
     "password": "MySQL8IsGreat!",
@@ -113,22 +131,12 @@ try:
 
     db = mysql.connector.connect(**config) 
     #initialize cursor
-    cursor = db.cursor()
-    
+    cursor = db.cursor()    
     # output the connection status 
     print("\nDatabase user {} connected to MySQL on host {} with database {}".format(config["user"], config["host"], config["database"]))
     print("\nWelcome to Whatabook.")
-
-   # input("\n\n  Press any key to continue...")
-
-#testing queries and output.
-    #select_all_users(cursor)
-    #select_all_books(cursor)
-    #select_all_stores(cursor)
-    #select_user_wishlist(cursor,"2")
-    #validate_user()
-    #select_user_wishlist(cursor,user_id)
-    show_menu()
+    
+    show_menu()    
 
 except mysql.connector.Error as err:
     """ on error code """
@@ -144,7 +152,6 @@ except mysql.connector.Error as err:
 
 finally:
     """ close the connection to MySQL """
-
     db.close()
 
 
