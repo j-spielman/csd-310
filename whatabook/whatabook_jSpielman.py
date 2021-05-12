@@ -10,6 +10,7 @@ user_id = 0
 #validate that user input is 1,2, or 3. Loop until a valid ID is selected.
 def validate_user():
     valid = False    
+    #repeat user id entry until valid value is entered
     while(valid == False):
         try:
             user_id = int(input("Please enter your customer ID(Users_ID 1-3 are valid): "))
@@ -61,7 +62,7 @@ def select_user_wishlist(cursor,user_id):
 #main menu method
 def show_menu():
     end = False
-
+    #repeat menu selection entry until valid value is entered
     while(end == False):
         try:
             menu_selection = int(input("Enter 1 to view all books, 2 to view all locations,3 to view your account, or 4 to quit: "))
@@ -85,14 +86,14 @@ def show_books_to_add(cursor,user_id):
                     "FROM book "+
                     "WHERE book_id NOT IN (SELECT book_id FROM wishlist WHERE user_id ={})".format(user_id))
     available_books = cursor.fetchall()    
-
     print("\nChoose a book to add ot your wishlist:")    
     for book in available_books:
         print("\nBook ID: {}\nBook Name: {}\nAuthor: {}\nDetails: {}".format(book[0],book[1],book[2],book[3]))       
     available_book_ids = []
-    
+    #fill array with book_ids to check entered value
     for book in available_books:
         available_book_ids.append(book[0])  
+    #check if entered value is available/valid entry, if not return to menu without adding book.
     try:
         available_books = cursor.fetchall()          
         book_id = int(input("Enter the book_id of the book you would like to add: "))   
@@ -106,7 +107,7 @@ def show_books_to_add(cursor,user_id):
         print("Invalid entry. Book was not added.")
         book_id = 0
         return book_id
-
+#add selected book to user wishlist. commit() changes to database.
 def add_book_to_wishlist(cursor,user_id,book_id,db):
     cursor.execute("INSERT INTO wishlist(user_id, book_id) "+
                     "VALUES({},{})".format(user_id,book_id))
@@ -115,9 +116,8 @@ def add_book_to_wishlist(cursor,user_id,book_id,db):
 #account menu view
 def show_account_menu():
     user_id = validate_user()
-    
     end = False
-
+    #repeat account_menu entry until valid value is entered
     while(end == False):
         try:
             account_menu_selection = int(input("\nEnter 1 to view your wishlist, 2 to add a book to your wishlist, or 3 to return to the main menu: "))
