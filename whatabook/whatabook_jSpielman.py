@@ -1,3 +1,6 @@
+#Joseph Spielman |whatabook module 12| 05/11/21
+#Connect to mysql database, allow user to view books, locations and their account. In Account, view wishlist and add books to the users wishlist
+
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -32,7 +35,7 @@ def select_all_users(cursor):
 def select_all_books(cursor):
     cursor.execute("SELECT * FROM book")
     books = cursor.fetchall()
-    print("\n Book List:")
+    print("\n----Book List----")
     for book in books:
         print(" Book ID: {}\n Book Name: {}\n Author:{}\n Details: {}\n".format(book[0],book[1],book[2],book[3]))
 
@@ -40,7 +43,7 @@ def select_all_books(cursor):
 def select_all_stores(cursor):
     cursor.execute("SELECT * FROM store")
     stores = cursor.fetchall()
-    print("\n Store List:")
+    print("\n-----Store List----")
     for store in stores:
         print(" Store ID: {}\n Locale: {}\n".format(store[0],store[1]))
 
@@ -81,10 +84,28 @@ def show_books_to_add(cursor,user_id):
     cursor.execute("SELECT book_id, book_name, author, details " +
                     "FROM book "+
                     "WHERE book_id NOT IN (SELECT book_id FROM wishlist WHERE user_id ={})".format(user_id))
-    available_books = cursor.fetchall()
-    print("\nChoose a book to add ot your wishlist:")
+    available_books = cursor.fetchall()    
+
+    print("\nChoose a book to add ot your wishlist:")    
     for book in available_books:
-        print("\nBook ID: {}\nBook Name: {}\nAuthor: {}\nDetails: {}".format(book[0],book[1],book[2],book[3]))
+        print("\nBook ID: {}\nBook Name: {}\nAuthor: {}\nDetails: {}".format(book[0],book[1],book[2],book[3]))       
+    available_book_ids = []
+    
+    for book in available_books:
+        available_book_ids.append(book[0])  
+    try:
+        available_books = cursor.fetchall()          
+        book_id = int(input("Enter the book_id of the book you would like to add: "))   
+        if book_id not in available_book_ids:
+            print("Unavailable Book ID. Book was not added.")
+            book_id = 0
+            return book_id
+        else:
+            return book_id            
+    except ValueError:
+        print("Invalid entry. Book was not added.")
+        book_id = 0
+        return book_id
 
 def add_book_to_wishlist(cursor,user_id,book_id,db):
     cursor.execute("INSERT INTO wishlist(user_id, book_id) "+
@@ -103,9 +124,9 @@ def show_account_menu():
             if account_menu_selection == 1:
                 select_user_wishlist(cursor,user_id)
             if account_menu_selection == 2:
-                show_books_to_add(cursor,user_id)
-                book_id = int(input("Enter the book_id of the book you would like to add: "))
-                add_book_to_wishlist(cursor,user_id,book_id,db)
+                book_id = show_books_to_add(cursor,user_id)                
+                if book_id != 0:
+                    add_book_to_wishlist(cursor,user_id,book_id,db)
             if account_menu_selection == 3:
                 print("\nReturned to Main Menu")
                 end = True
